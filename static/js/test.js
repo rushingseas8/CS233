@@ -6,6 +6,20 @@ var currentPath = [];
 
 var commandHeldDown = false;
 
+function point(x, y) {
+  this.x = x;
+  this.y = y;
+
+  // TODO add better error checking here
+  this.distanceTo = function(otherPoint) {
+    return Math.sqrt(Math.pow(otherPoint.x - this.x, 2) + Math.pow(otherPoint.y - this.y, 2));
+  }
+}
+
+function distanceBetween(point1, point2) {
+  return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
+}
+
 function path(pathArr) {
   this.paths = pathArr;
   this.getStart = function() {
@@ -48,10 +62,28 @@ $(document).ready(function() {
     //console.log("Path generated: " + JSON.stringify(currentPath));
     //ctx.closePath();
 
-    testPath = new path(currentPath);
-    console.log(testPath);
-    console.log(testPath.getStart());
-    console.log(testPath.getEnd());
+    currentPathObj = new path(currentPath);
+
+    // TODO: remove the magic number (should be some function of path size, bounds
+    // of the whole path, canvas size, etc.)
+    if (distanceBetween(currentPath[0], currentPath[currentPath.length - 1]) < 25.0) {
+      // TODO: better merge algorithm. Try to "curve" the points in a way that
+      // approximates moving the whole line.
+      //
+      // Better 1: last 10 points should be averaged between current position and
+      // the start of the path
+      //
+      // Better 2: Find out where the approximate line is (take at least 3 points
+      // and keep adding more while they improve the line of best fit; stop when
+      // the accuracy diminishes); adjust all those points to point to start node
+      // rather than end node.
+      ctx.beginPath();
+      ctx.moveTo(currentPath[currentPath.length - 1].x, currentPath[currentPath.length - 1].y);
+      ctx.lineTo(currentPath[0].x, currentPath[0].y);
+      ctx.stroke();
+
+      currentPath[currentPath.length - 1] = currentPath[0];
+    }
 
     if (currentPath.length > 0) {
       paths.push(currentPath);
