@@ -85,6 +85,15 @@ $(document).ready(function() {
       currentPath[currentPath.length - 1] = currentPath[0];
     }
 
+    $.ajax({
+      type: 'POST',
+      url: '/processPaths',
+      data: JSON.stringify({ path: currentPath }),
+      success: function(data) { console.log("Successfully posted!"); },
+      contentType: "application/json",
+      dataType: 'json'
+    });
+
     if (currentPath.length > 0) {
       paths.push(currentPath);
     }

@@ -62,7 +62,8 @@ def isBlack(img, x, y):
     return img[x, y] < 128
 
 if __name__ == "__main__":
-    path = '/Users/aleksandrovich/Desktop/circuit2.png'
+    #path = '/Users/aleksandrovich/Desktop/circuit2.png'
+    path = '/Users/George/Desktop/circuit1.png'
     img = cv2.imread(path, cv2.IMREAD_COLOR)
     dispImg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -95,9 +96,9 @@ if __name__ == "__main__":
     """
 
     for i in range(4000):
-        customLineDetect(dispImg, gray, int(random.random() * gray.shape[0]), int(random.random() * gray.shape[1]))
+        customLineDetect(img, gray, int(random.random() * gray.shape[0]), int(random.random() * gray.shape[1]))
 
-    plt.imshow(dispImg), plt.show()
+    plt.imshow(img), plt.show()
 
 # Is this pixel in a grayscale image black?
 
