@@ -7,6 +7,7 @@ var currentPath = [];
 var commandHeldDown = false;
 
 function point(x, y) {
+  this.type = "point";
   this.x = x;
   this.y = y;
 
@@ -21,14 +22,60 @@ function distanceBetween(point1, point2) {
 }
 
 function path(pathArr) {
-  this.paths = pathArr;
+  this.type = "path";
+
+  if (pathArr.length > 0 && pathArr[0].type == "path") {
+    this.pathArr = pathArr;
+  } else {
+    console.log("Failed to create path: pathArr contains non-point objects");
+    this.pathArr = null;
+  }
+
   this.getStart = function() {
     return this.paths[0];
   }
   this.getEnd = function() {
     return this.paths[this.paths.length - 1];
   }
+
+  this.mergeWith = function(other) {
+    if (this.getEnd().distanceTo(other.getStart()) < 25.0) {
+      this.pathArr = this.pathArr.concat(other.pathArr);
+      other.pathArr = null;
+    }
+  }
 }
+
+/*
+function attemptAllMerges() {
+  var allStarts = [];
+  var allEnds = [];
+  for (var i = 0; i < paths.length; i++) {
+    allStarts.append(paths[i][0]);
+    allEnds.append(paths[i][paths[i].length - 1]);
+  }
+
+  // go through all start/ends
+  for (var i = 0; i < paths.length; i++) {
+    // make a list of all distances, sort by < mergeThreshold, sort low->high
+    //var distStarts = [];
+    var distEnds = []
+    for (int j = 0; j < paths.length; j++) {
+      if (i != j) {
+        distEnds.append(allStarts[i] - allEnds[j]);
+      }
+    }
+
+    distEnds = distEnds
+      .filter(function(dist) { return dist < 25.0 })
+      .sortby(function(a, b) { return a < b; });
+
+    if (distEnds.length > 0) {
+
+    }
+  }
+}
+*/
 
 /*
   Some todos:
@@ -77,6 +124,9 @@ $(document).ready(function() {
       // and keep adding more while they improve the line of best fit; stop when
       // the accuracy diminishes); adjust all those points to point to start node
       // rather than end node.
+      //
+      // Also try: Use the last 3 points in the path as an input to the interpolation
+      // line between the last and first point.
       ctx.beginPath();
       ctx.moveTo(currentPath[currentPath.length - 1].x, currentPath[currentPath.length - 1].y);
       ctx.lineTo(currentPath[0].x, currentPath[0].y);
@@ -85,11 +135,72 @@ $(document).ready(function() {
       currentPath[currentPath.length - 1] = currentPath[0];
     }
 
+    /*
+    var curStart = currentPath[0];
+    var curEnd = currentPath[currentPath.length - 1];
+    var merged = false;
+    for (var i = 0; i < paths.length; i++) {
+      var pathStart = paths[i][0];
+      var pathEnd = paths[i][paths[i].length - 1];
+
+      if (distanceBetween(curEnd, pathStart) < 25.0) {
+        console.log("End of current close to start. Merging.");
+      }
+
+      if (distanceBetween(curStart, pathEnd) < 25.0) {
+        console.log("Start of current close to end. Merging.");
+      }
+
+      if (distanceBetween(curStart, pathStart) < 25.0) {
+        console.log("Starts close. Reverse merging.");
+      }
+
+      if (distanceBetween(curEnd, pathEnd) < 25.0) {
+        console.log("Ends close. Reverse merging.");
+      }
+    }
+    */
+
+    /*
+    for (var i = 0; i < currentPath.length; i++) {
+      ctx.beginPath();
+      ctx.arc(currentPath[i].x, currentPath[i].y, 2, 0, 2 * Math.PI, false);
+      ctx.fillStyle = 'blue';
+      ctx.fill();
+      ctx.stroke();
+    }
+    */
+
     $.ajax({
       type: 'POST',
       url: '/processPaths',
       data: JSON.stringify({ path: currentPath }),
-      success: function(data) { console.log("Successfully posted!"); },
+      success: function(data) {
+        console.log(JSON.stringify(data));
+
+        var corners = data.corners;
+        var centers = data.centers;
+
+        for (var i = 0; i < corners.length; i++) {
+          dataElement = corners[i];
+          coord = dataElement[0];
+          power = dataElement[1];
+
+          ctx.beginPath();
+          ctx.arc(coord[0], coord[1], power, 0, 2 * Math.PI, false);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+          ctx.stroke();
+        }
+
+       for (var i = 0; i < centers.length; i++) {
+         ctx.beginPath();
+         ctx.arc(centers[i][0], centers[i][1], 5, 0, 2 * Math.PI, false);
+         ctx.fillStyle = 'blue';
+         ctx.fill();
+         ctx.stroke();
+       }
+      },
       contentType: "application/json",
       dataType: 'json'
     });

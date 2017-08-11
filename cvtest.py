@@ -62,8 +62,8 @@ def isBlack(img, x, y):
     return img[x, y] < 128
 
 if __name__ == "__main__":
-    #path = '/Users/aleksandrovich/Desktop/circuit2.png'
-    path = '/Users/George/Desktop/circuit1.png'
+    path = '/Users/aleksandrovich/Desktop/circuit4.png'
+    #path = '/Users/George/Desktop/circuit1.png'
     img = cv2.imread(path, cv2.IMREAD_COLOR)
     dispImg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -95,10 +95,15 @@ if __name__ == "__main__":
     plt.imshow(gray),plt.show()
     """
 
-    for i in range(4000):
-        customLineDetect(img, gray, int(random.random() * gray.shape[0]), int(random.random() * gray.shape[1]))
+    #for i in range(4000):
+    #    customLineDetect(img, gray, int(random.random() * gray.shape[0]), int(random.random() * gray.shape[1]))
 
-    plt.imshow(img), plt.show()
+    corners = [(433, 233), (431, 245), (430, 263), (429, 271), (431, 315), (436, 315), (449, 314), (466, 314), (487, 314), (518, 314), (548, 314), (582, 315), (616, 319), (631, 324), (657, 326), (680, 329), (688, 332), (704, 333), (709, 334), (717, 335), (724, 337), (729, 337), (732, 338), (730, 338), (724, 335), (717, 329), (707, 321), (689, 310), (670, 291), (650, 270), (640, 247), (622, 236), (616, 216), (604, 209), (595, 194), (592, 184), (587, 181), (583, 175), (581, 170), (579, 168)]
+
+    for (x, y) in corners:
+        cv2.circle(dispImg, (x * 2, y*2), 5, 255, -1)
+
+    plt.imshow(dispImg), plt.show()
 
 # Is this pixel in a grayscale image black?
 
